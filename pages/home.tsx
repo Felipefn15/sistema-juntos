@@ -119,6 +119,7 @@ const Home = () => {
         backgroundColor,
         color: "white", // You can also set text color here if needed
         borderRadius: "5px", // Optional: Adding border radius to the event box
+        marginLeft: '5px'
       },
     };
   };
