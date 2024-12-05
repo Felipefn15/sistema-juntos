@@ -9,7 +9,8 @@ export default NextAuth({
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      // async authorize(credentials) {
+      async authorize() {
         // Replace this with real user authentication
         const user = {
           id: "1",

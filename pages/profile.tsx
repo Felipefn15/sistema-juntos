@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import Calendar from "react-calendar";
+import React from "react";
 import "react-calendar/dist/Calendar.css";
 import { getSession } from "next-auth/react";
+import { GetServerSidePropsContext } from "next";
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const session = await getSession(context);
 
   if (!session) {

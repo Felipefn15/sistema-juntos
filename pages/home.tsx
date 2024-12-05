@@ -9,7 +9,9 @@ import { Appointment } from "@/types";
 
 const localizer = momentLocalizer(moment);
 
-export const getServerSideProps = async (context: any) => {
+import { GetServerSidePropsContext } from "next";
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const session = await getSession(context);
 
   if (!session) {
@@ -31,18 +33,25 @@ const Home = () => {
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [eventDetailsModalOpen, setEventDetailsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null);
-  const [newEvent, setNewEvent] = useState<Partial<Appointment>>({});
+  const [newEvent, setNewEvent] = useState<Appointment | null>();
   const [existingPatients] = useState(["John Doe", "Jane Smith", "Emily Davis"]); // Example patients
 
   // Handle slot selection
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-    setNewEvent({ start, end });
+    setNewEvent({ 
+      title: '',
+      patientName: '',
+      id: 0,
+      checked: false,
+      start, 
+      end 
+    });
     setScheduleModalOpen(true);
   };
 
   // Add new event
   const handleAddEvent = () => {
-    if (newEvent.title && newEvent.patientName) {
+    if (newEvent?.title && newEvent?.patientName) {
       const eventToAdd = {
         ...newEvent,
         id: events.length + 1,
@@ -105,7 +114,7 @@ const Home = () => {
   );
 
   // Change the event color based on its status
-  const eventPropGetter: EventPropGetter = (event: Appointment) => {
+  const eventPropGetter: EventPropGetter<Appointment> = (event: Appointment) => {
     let backgroundColor = "blue"; // Default color
 
     if (event.checked) {
@@ -144,14 +153,14 @@ const Home = () => {
       />
 
       {/* Schedule Appointment Modal */}
-      <ScheduleModal
+      {newEvent && <ScheduleModal
         existingPatients={existingPatients}
         handleAddEvent={handleAddEvent}
         modalOpen={scheduleModalOpen}
         setModalOpen={setScheduleModalOpen}
         newEvent={newEvent}
         setNewEvent={setNewEvent}
-      />
+      />}
 
       {/* Event Details Modal */}
       <EventDetailsModal
