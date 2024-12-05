@@ -10,13 +10,14 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       // async authorize(credentials) {
-      async authorize() {
+      async authorize(credentials) {
         // Replace this with real user authentication
         const user = {
           id: "1",
           name: "Psychologist",
           email: "psychologist@example.com",
         };
+        console.log({credentials})
         return user;
         // if (
         //   credentials?.username === "user" &&
