@@ -1,23 +1,6 @@
-import { getSession } from "next-auth/react";
+import { withAuth } from "@/utils/withAuth";
 
-import { GetServerSidePropsContext } from "next";
-
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
-};
+export const getServerSideProps = withAuth();
 const Patient = () => {
     return (
       <div className="min-h-screen p-8 bg-gray-100">

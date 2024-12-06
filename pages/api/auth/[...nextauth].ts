@@ -1,48 +1,29 @@
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 export default NextAuth({
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      // async authorize(credentials) {
-      async authorize(credentials) {
-        // Replace this with real user authentication
-        const user = {
-          id: "1",
-          name: "Psychologist",
-          email: "psychologist@example.com",
-        };
-        console.log({credentials})
-        return user;
-        // if (
-        //   credentials?.username === "user" &&
-        //   credentials?.password === "password"
-        // ) {
-        //   return user;
-        // }
-        // return null;
-      },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  pages: {
-    signIn: "/",
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt", // Use JWT for session management
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({ token, account, profile }) {
+      // Add extra data to the token
+      if (account && profile) {
+        token.accessToken = account.access_token;
       }
       return token;
     },
-    async session({ session, token }) {
-      session.user = token;
+    async session({ session }) {
+      // Add extra data to the session
+      // session.user.id = token.sub;
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET, // Use a strong secret in production
 });
