@@ -1,32 +1,15 @@
 import React, { useState } from "react";
 import { Calendar, momentLocalizer, EventPropGetter } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { getSession } from "next-auth/react";
 import moment from "moment";
 import ScheduleModal from "@/components/ScheduleModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
 import { Appointment } from "@/types";
+import { withAuth } from "@/utils/withAuth";
+
+export const getServerSideProps = withAuth();
 
 const localizer = momentLocalizer(moment);
-
-import { GetServerSidePropsContext } from "next";
-
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { session },
-  };
-};
 
 const Home = () => {
   const [events, setEvents] = useState<Appointment[]>([]);
