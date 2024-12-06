@@ -20,7 +20,7 @@ export default NextAuth({
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session }) {
       // Add extra data to the session
       // session.user.id = token.sub;
       return session;
