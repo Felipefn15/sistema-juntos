@@ -9,7 +9,7 @@ export const withAuth = (gssp?: GetServerSideProps) => {
       if (!session) {
         return {
           redirect: {
-            destination: "/login", // Redirecting to the login page
+            destination: "/", // Redirecting to the login page
             permanent: false,
           },
         };
