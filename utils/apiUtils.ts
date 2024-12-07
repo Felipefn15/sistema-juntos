@@ -27,7 +27,7 @@ export const fetchPatientsAPI = async () => {
       });
       if (!response.ok) throw new Error("Failed to add patient");
       const newPatient = await response.json();
-      return newPatient
+      return newPatient[0]
     } catch (error) {
       console.error(error);
       return null;
@@ -82,4 +82,52 @@ export const deleteAppointmentAPI = async (appointmentId: string) => {
     console.error(error);
     return null;
   }
+};
+
+// Utility function to add a new description
+export const addDescriptionAPI = async ({ description, eventId }: { description: string, eventId: string }) => {
+  const response = await fetch("/api/evolucao", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ description, eventId }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to add description");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+// Utility function to get descriptions for a specific event
+export const getDescriptionsAPI = async (eventId: string) => {
+  const response = await fetch(`/api/evolucao/${eventId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch descriptions");
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+// Utility function to delete a description
+export const deleteDescriptionAPI = async (descriptionId: string) => {
+  const response = await fetch("/api/evolucao", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ descriptionId }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete description");
+  }
+
+  const data = await response.json();
+  return data;
 };

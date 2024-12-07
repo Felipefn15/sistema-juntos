@@ -83,16 +83,6 @@ const Navbar = () => {
           Home
         </Link>
         <Link
-          href="/appointment"
-          className={`mb-4 p-2 rounded w-full ${
-            isActive("/appointment")
-              ? "bg-blue-400 font-bold"
-              : "hover:bg-blue-400"
-          }`}
-        >
-          Agendamento
-        </Link>
-        <Link
           href="/profile"
           className={`mb-4 p-2 rounded w-full ${
             isActive("/profile") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"

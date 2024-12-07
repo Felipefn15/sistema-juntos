@@ -68,7 +68,6 @@ const ScheduleModal = ({
           paciente_id: createdPatient.id, // Store the paciente_id
           psicologa_id: "98b0d401-bc35-45ca-8caa-fa1452890b7c", // Reset psicologa_id as well
         });
-
         // After the state is updated, save the appointment
         await handleSaveAppointment({
           ...newEvent,

@@ -3,6 +3,7 @@ import { supabase } from "@/utils/supabaseClient";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
+    console.log({body:req.body})
     const { data, error } = await supabase
       .from("agendamento")
       .insert([req.body])
