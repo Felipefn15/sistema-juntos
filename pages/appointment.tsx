@@ -1,3 +1,4 @@
+import { Evolucao } from "@/types";
 import { addDescriptionAPI, getDescriptionsAPI, deleteDescriptionAPI } from "@/utils/apiUtils";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -7,13 +8,13 @@ const Appointment = () => {
   const { eventId, pacienteName, start, end, psicologaName } = router.query;
 
   const [description, setDescription] = useState("");
-  const [descriptions, setDescriptions] = useState<any[]>([]); // Store description history
+  const [descriptions, setDescriptions] = useState<Evolucao[]>([]); // Store description history
 
   // Fetch existing descriptions
   useEffect(() => {
     const fetchDescriptions = async () => {
-      if (eventId) {
-        const data = await getDescriptionsAPI(eventId as string);
+      if (eventId && typeof eventId === "string") {
+        const data = await getDescriptionsAPI(eventId);
         setDescriptions(data);
       }
     };
@@ -24,22 +25,26 @@ const Appointment = () => {
   const handleSaveNotes = async () => {
     if (!description) return; // Ensure the description is not empty
 
-    await addDescriptionAPI({
-      description,
-      eventId,
-    });
+    if (eventId && typeof eventId === "string") {
+      await addDescriptionAPI({
+        description,
+        eventId,
+      });
 
-    // Re-fetch descriptions after adding a new one
-    const data = await getDescriptionsAPI(eventId as string);
-    setDescriptions(data);
+      // Re-fetch descriptions after adding a new one
+      const data = await getDescriptionsAPI(eventId);
+      setDescriptions(data);
 
-    setDescription(""); // Clear textarea after saving
+      setDescription(""); // Clear textarea after saving
+    }
   };
 
   const handleDeleteDescription = async (descriptionId: string) => {
-    await deleteDescriptionAPI(descriptionId);
-    const data = await getDescriptionsAPI(eventId as string);
-    setDescriptions(data);
+    if (eventId && typeof eventId === "string") {
+      await deleteDescriptionAPI(descriptionId);
+      const data = await getDescriptionsAPI(eventId);
+      setDescriptions(data);
+    }
   };
 
   const handleEditDescription = (descriptionId: string, newDescription: string) => {
@@ -79,13 +84,13 @@ const Appointment = () => {
           <p className="font-semibold text-lg">
             <strong>Começo:</strong>{" "}
             <span className="text-gray-600">
-              {start && formatDate(start as string)}
+              {start && typeof start === "string" && formatDate(start)}
             </span>
           </p>
           <p className="font-semibold text-lg">
             <strong>Fim:</strong>{" "}
             <span className="text-gray-600">
-              {end && formatDate(end as string)}
+              {end && typeof end === "string" && formatDate(end)}
             </span>
           </p>
         </div>

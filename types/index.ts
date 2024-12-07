@@ -20,3 +20,11 @@ export interface Patient {
 export interface AppointmentWithPatient extends Appointment{
   Patient?: Patient
 }
+
+export interface Evolucao {
+  id: string;                // The unique identifier for the evolution record (assuming it's an UUID or string)
+  agendamento_id: string;     // The event related to the evolution
+  descricao: string;
+  created_at: string;        // Timestamp when the record was created
+  updated_at: string;        // Timestamp when the record was last updated
+}

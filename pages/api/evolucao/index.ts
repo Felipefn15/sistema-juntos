@@ -49,7 +49,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     res.status(405).json({ message: "Method Not Allowed" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }  catch (error: unknown) {
+    // Safely handle the unknown error type
+    if (error instanceof Error) {
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
+    } else {
+      // Fallback error handling if error is not an instance of Error
+      res.status(500).json({ message: "Internal Server Error", error: "An unknown error occurred" });
+    }
   }
 }

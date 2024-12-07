@@ -24,8 +24,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.setHeader("Allow", ["GET", "POST"]).status(405).end(`Method ${req.method} Not Allowed`);
-  } catch (error) {
-    console.error("Error in API handler:", error);
-    return res.status(500).json({ error: error.message });
+  }  catch (error: unknown) {
+    // Safely handle the unknown error type
+    if (error instanceof Error) {
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
+    } else {
+      // Fallback error handling if error is not an instance of Error
+      res.status(500).json({ message: "Internal Server Error", error: "An unknown error occurred" });
+    }
   }
 }

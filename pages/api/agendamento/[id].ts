@@ -1,5 +1,3 @@
-// pages/api/agendamento/[id].ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/utils/supabaseClient";
 
@@ -19,9 +17,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Respond with the deleted appointment or a success message
       return res.status(200).json(data);
-    } catch (error) {
-      console.error("Error deleting appointment:", error);
-      return res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      // Type assertion to access properties on the error
+      if (error instanceof Error) {
+        console.error("Error deleting appointment:", error.message);
+        return res.status(500).json({ error: error.message });
+      }
+      
+      // Handle case where error isn't an instance of Error
+      console.error("Unknown error:", error);
+      return res.status(500).json({ error: "An unknown error occurred" });
     }
   }
 
