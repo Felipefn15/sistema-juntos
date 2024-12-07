@@ -1,3 +1,5 @@
+import { Patient } from "@/types";
+
 // Utility function to handle the `GET` request to fetch all patients
 export const fetchPatientsAPI = async () => {
     try {
@@ -33,30 +35,64 @@ export const fetchPatientsAPI = async () => {
       return null;
     }
   };
+
+  // Update a patient
+  export const updatePatientAPI = async (patient: Patient) => {
+    const response = await fetch(`/api/paciente/${patient.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(patient),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update patient");
+    }
+
+    return await response.json();
+  };
   
   // Utility function to handle the `POST` request to create an appointment
-  export const addAppointmentAPI = async (appointmentData: {
-    psicologa_id: string;
-    paciente_id: string;
-    start_date: Date;
-    end_date: Date;
-  }) => {
-    try {
-      const response = await fetch("/api/agendamento", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(appointmentData),
-      });
-  
-      if (!response.ok) throw new Error("Failed to create appointment");
-      return await response.json();
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
+  import moment from "moment-timezone";
+
+export const addAppointmentAPI = async (appointmentData: {
+  psicologa_id: string;
+  paciente_id: string;
+  start_date: Date;
+  end_date: Date;
+}) => {
+  try {
+    //Convert start_date and end_date to UTC
+    const startInUTC = moment(appointmentData.start_date)
+      .tz("America/Sao_Paulo")
+      .utc()
+      .toISOString();
+    const endInUTC = moment(appointmentData.end_date)
+      .tz("America/Sao_Paulo")
+      .utc()
+      .toISOString();
+
+    // Update the data to include UTC times
+    const response = await fetch("/api/agendamento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...appointmentData,
+        start_date: startInUTC,
+        end_date: endInUTC,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to create appointment");
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
 
 // Utility function to handle the `GET` request to fetch all appointments
 export const fetchAppointmentsAPI = async () => {

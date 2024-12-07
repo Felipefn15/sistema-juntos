@@ -13,7 +13,7 @@ export interface Patient {
   id: string;
   nome: string;
   contato: string;
-  data_nascimento: Date;
+  data_nascimento: string;
   responsavel: string
 }
 
