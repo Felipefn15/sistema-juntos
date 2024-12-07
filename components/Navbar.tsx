@@ -8,6 +8,7 @@ const Navbar = () => {
   const { data: session } = useSession(); // Get the session
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false); // State for toggling menu
+  const psicologaName = session?.user?.name?.split(' ')[0] || "";
 
   const isActive = (path: string) => router.pathname === path;
 
@@ -16,7 +17,7 @@ const Navbar = () => {
       {/* Mobile Navbar */}
       <nav className="lg:hidden bg-blue-500 text-white p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">JUNTOS</h1>
+          <h1 className="text-xl font-bold">JUNTOS - {psicologaName}</h1>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-white focus:outline-none"
@@ -73,7 +74,7 @@ const Navbar = () => {
 
       {/* Desktop Navbar */}
       <nav className="hidden lg:flex fixed top-0 left-0 h-screen w-64 bg-blue-500 text-white flex-col items-start p-4">
-        <h1 className="mb-8 text-2xl font-semibold">JUNTOS</h1>
+        <h1 className="mb-8 text-2xl font-semibold">JUNTOS - {psicologaName}</h1>
         <Link
           href="/home"
           className={`mb-4 p-2 rounded w-full ${

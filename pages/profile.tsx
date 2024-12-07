@@ -16,7 +16,7 @@ const Profile = () => {
 
   return (
     <div className="container mx-auto max-w-md p-6 bg-white rounded-lg shadow-lg mt-10">
-      <h1 className="text-2xl font-bold text-center mb-4">Psychologist Profile</h1>
+      <h1 className="text-2xl font-bold text-center mb-4">Perfil</h1>
       <div className="space-y-4">
         <div className="flex justify-between">
           <span className="font-semibold text-gray-700">Nome:</span>
