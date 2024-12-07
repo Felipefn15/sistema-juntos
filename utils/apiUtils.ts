@@ -131,3 +131,85 @@ export const deleteDescriptionAPI = async (descriptionId: string) => {
   const data = await response.json();
   return data;
 };
+// Fetch psicologa by email
+export const getPsicologaByEmail = async (email: string) => {
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || "http://localhost:3000";
+  const url = `${baseUrl}/api/psicologa?email=${encodeURIComponent(email)}`;
+
+  try {
+    const response = await fetch(url);
+
+    if (response.status === 404) {
+      // If the psicologa is not found, return null instead of throwing an error
+      return null;
+    }
+
+    if (!response.ok) {
+      // For other non-successful status codes, throw an error
+      throw new Error(`Failed to fetch psicologa: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching psicologa:", error);
+    throw error;
+  }
+};
+
+// Update existing psicologa
+export const updatePsicologa = async (id: string, name: string, image: string) => {
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || "http://localhost:3000";
+  const url = `${baseUrl}/api/psicologa`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, name, image }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update psicologa: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating psicologa:", error);
+    throw error;
+  }
+};
+
+// Insert new psicologa
+export const insertPsicologa = async (
+  email: string,
+  name: string,
+  image: string,
+  google_id: string
+) => {
+  const baseUrl = process.env.NEXTAUTH_URL || process.env.BASE_URL || "http://localhost:3000";
+  const url = `${baseUrl}/api/psicologa`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, name, image, google_id, documento: "", contato: "" }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to insert psicologa: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error inserting psicologa:", error);
+    throw error;
+  }
+};

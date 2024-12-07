@@ -1,21 +1,25 @@
-import React from "react";
-import "react-calendar/dist/Calendar.css";
-import { withAuth } from "@/utils/withAuth";
+// pages/profile.tsx
 
-export const getServerSideProps = withAuth();
+import { useSession } from "next-auth/react";
+
 const Profile = () => {
-    return (
-      <div className="min-h-screen p-8 bg-gray-100">
-        <h1 className="mb-6 text-2xl font-semibold">Profile</h1>
-        <div className="max-w-md mx-auto space-y-4">
-          <p>Name: John Doe</p>
-          <p>Contact: (123) 456-7890</p>
-          <p>Email: john.doe@example.com</p>
-          <p>Clinic Days: Monday, Wednesday, Friday</p>
-        </div>
+  const { data: session } = useSession();
+
+  if (!session) {
+    return <p>You need to be logged in to view this page.</p>;
+  }
+
+  return (
+    <div>
+      <h1>Profile</h1>
+      <div>
+        <p>Name: {session.user.name}</p>
+        <p>Email: {session.user.email}</p>
+        <img src={session.user.image} alt={session.user.name} />
+        {/* You can also show other user-related data here */}
       </div>
-    );
-  };
-  
-  export default Profile;
-  
+    </div>
+  );
+};
+
+export default Profile;
