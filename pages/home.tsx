@@ -52,7 +52,6 @@ const Home = () => {
   // Handle slot selection
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     setNewEvent({
-      checked: false,
       start_date: start,
       end_date: end,
       id: "",
@@ -88,18 +87,6 @@ const Home = () => {
     }
   };
 
-  // Mark event as completed
-  const handleCheckEvent = () => {
-    if (selectedEvent) {
-      setEvents((prevEvents) =>
-        prevEvents.map((e) =>
-          e.id === selectedEvent.id ? { ...e, checked: !e.checked } : e
-        )
-      );
-      setEventDetailsModalOpen(false);
-    }
-  };
-
   // Redirect to appointment notes page
   const handleWriteNotes = () => {
     if (selectedEvent) {
@@ -117,7 +104,12 @@ const Home = () => {
 
   // Custom event style
   const eventPropGetter: EventPropGetter<Appointment> = (event: Appointment) => {
-    const backgroundColor = event.checked ? "#419e60" : "#a34346";
+    let backgroundColor = "#a34346"; // Default: Not paid
+  
+    if (event.paid) {
+      backgroundColor = "#419e60"; // Paid
+    }
+  
     return {
       style: {
         backgroundColor,
@@ -127,6 +119,7 @@ const Home = () => {
       },
     };
   };
+  
 
   return (
     <div className="min-h-screen p-2 md:p-8 bg-gray-100 lg:ml-64">
@@ -178,7 +171,6 @@ const Home = () => {
         event={selectedEvent}
         onDelete={handleDeleteEvent}
         onWriteNotes={handleWriteNotes}
-        onCheck={handleCheckEvent}
       />
     </div>
   );
