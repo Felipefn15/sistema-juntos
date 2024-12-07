@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer, EventPropGetter } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
 import ScheduleModal from "@/components/ScheduleModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
-import { Appointment } from "@/types";
+import { Appointment, AppointmentWithPatient, Patient } from "@/types";
 import { withAuth } from "@/utils/withAuth";
+import { fetchAppointmentsAPI, fetchPatientsAPI, deleteAppointmentAPI } from "@/utils/apiUtils";
 
 export const getServerSideProps = withAuth();
 
@@ -15,52 +16,79 @@ const Home = () => {
   const [events, setEvents] = useState<Appointment[]>([]);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [eventDetailsModalOpen, setEventDetailsModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<AppointmentWithPatient | null>(null);
   const [newEvent, setNewEvent] = useState<Appointment | null>();
-  const [existingPatients] = useState(["John Doe", "Jane Smith", "Emily Davis"]); // Example patients
+  const [existingPatients, setExistingPatients] = useState<Patient[]>([]);
+
+  useEffect(() => {
+    const loadPatients = async () => {
+      try {
+        const patients = await fetchPatientsAPI(); 
+        setExistingPatients(patients);
+
+      } catch (error) {
+        console.error("Failed to load patients:", error);
+      }
+    };
+    const loadAppointments = async () => {
+      try {
+        const appointments = await fetchAppointmentsAPI();
+  
+        // Convert the start and end dates to JavaScript Date objects
+        const formattedAppointments = appointments.map((appointment: Appointment) => ({
+          ...appointment,
+          start: new Date(appointment.start_date),
+          end: new Date(appointment.end_date),
+        }));
+  
+        setEvents(formattedAppointments);
+      } catch (error) {
+        console.error("Failed to load appointments:", error);
+      }
+    };
+    loadAppointments();
+    loadPatients();
+  }, [scheduleModalOpen]);
 
   // Handle slot selection
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     setNewEvent({ 
-      title: '',
-      patientName: '',
-      id: 0,
-      checked: false,
-      start, 
-      end 
+     checked: false,
+     start_date: start,
+     end_date: end,
+     id: '',
+     paciente_id: '',
+     psicologa_id: "98b0d401-bc35-45ca-8caa-fa1452890b7c"
     });
     setScheduleModalOpen(true);
   };
 
-  // Add new event
-  const handleAddEvent = () => {
-    if (newEvent?.title && newEvent?.patientName) {
-      const eventToAdd = {
-        ...newEvent,
-        id: events.length + 1,
-        checked: false,
-      } as Appointment;
-
-      setEvents((prevEvents) => [...prevEvents, eventToAdd]);
-      setScheduleModalOpen(false);
-    } else {
-      alert("Please provide all required details.");
-    }
-  };
-
   // Handle event selection
   const handleSelectEvent = (event: Appointment) => {
-    setSelectedEvent(event);
+    setSelectedEvent({
+      ...event,
+      Patient: existingPatients.find((patient) => patient.id === event.paciente_id)
+    });
     setEventDetailsModalOpen(true);
   };
 
-  // Delete selected event
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = async () => {
     if (selectedEvent) {
-      setEvents((prevEvents) =>
-        prevEvents.filter((e) => e.id !== selectedEvent.id)
-      );
-      setEventDetailsModalOpen(false);
+      try {
+        // Call the API to delete the event
+        const deletedAppointment = await deleteAppointmentAPI(selectedEvent.id);
+        
+        if (deletedAppointment) {
+          // If the event is deleted successfully, remove it from the state
+          setEvents((prevEvents) =>
+            prevEvents.filter((e) => e.id !== selectedEvent.id)
+          );
+          setEventDetailsModalOpen(false);
+        }
+      } catch (error) {
+        console.error("Failed to delete event:", error);
+        // Optionally, show an error message to the user
+      }
     }
   };
 
@@ -79,20 +107,14 @@ const Home = () => {
   // Redirect to appointment page with event data
   const handleWriteNotes = () => {
     if (selectedEvent) {
-      window.location.href = `/appointment?${new URLSearchParams({
-        id: selectedEvent.id.toString(),
-        title: selectedEvent.title,
-        patientName: selectedEvent.patientName,
-        start: selectedEvent.start.toISOString(),
-        end: selectedEvent.end.toISOString(),
-      })}`;
+      window.location.href = `/appointment`;
     }
   };
 
   // Custom event rendering
   const CustomEvent = ({ event }: { event: Appointment }) => (
     <span>
-      {event.title} - {event.patientName}
+      {existingPatients.find((patient) => patient.id === event.paciente_id)?.nome}
     </span>
   );
 
@@ -138,7 +160,6 @@ const Home = () => {
       {/* Schedule Appointment Modal */}
       {newEvent && <ScheduleModal
         existingPatients={existingPatients}
-        handleAddEvent={handleAddEvent}
         modalOpen={scheduleModalOpen}
         setModalOpen={setScheduleModalOpen}
         newEvent={newEvent}
