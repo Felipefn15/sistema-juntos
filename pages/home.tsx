@@ -7,12 +7,16 @@ import EventDetailsModal from "@/components/EventDetailsModal";
 import { Appointment, AppointmentWithPatient, Patient } from "@/types";
 import { withAuth } from "@/utils/withAuth";
 import { fetchAppointmentsAPI, fetchPatientsAPI, deleteAppointmentAPI } from "@/utils/apiUtils";
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps = withAuth();
 
 const localizer = momentLocalizer(moment);
 
 const Home = () => {
+  const { data: session } = useSession();
+  const psicologaId = session?.user?.psicologa?.id || ""; // Retrieve psicologa_id from session
+
   const [events, setEvents] = useState<Appointment[]>([]);
   const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
   const [eventDetailsModalOpen, setEventDetailsModalOpen] = useState(false);
@@ -53,7 +57,7 @@ const Home = () => {
       end_date: end,
       id: "",
       paciente_id: "",
-      psicologa_id: "98b0d401-bc35-45ca-8caa-fa1452890b7c",
+      psicologa_id: psicologaId,
     });
     setScheduleModalOpen(true);
   };

@@ -19,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const newPatient = await createPatient({ nome, data_nascimento, contato, responsavel });
-      console.log({newPatient})
       return res.status(201).json(newPatient);
     }
 
