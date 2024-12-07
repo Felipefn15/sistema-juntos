@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const { data, error } = await supabase
         .from("psicologa")
-        .update({ name, image })
+        .update({ nome: name, image })
         .eq("id", id)
         .select("*");
 
