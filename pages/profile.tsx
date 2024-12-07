@@ -1,21 +1,50 @@
-import React from "react";
-import "react-calendar/dist/Calendar.css";
-import { withAuth } from "@/utils/withAuth";
+import { useSession } from "next-auth/react";
 
-export const getServerSideProps = withAuth();
 const Profile = () => {
+  const { data: session } = useSession();
+
+  if (!session) {
     return (
-      <div className="min-h-screen p-8 bg-gray-100">
-        <h1 className="mb-6 text-2xl font-semibold">Profile</h1>
-        <div className="max-w-md mx-auto space-y-4">
-          <p>Name: John Doe</p>
-          <p>Contact: (123) 456-7890</p>
-          <p>Email: john.doe@example.com</p>
-          <p>Clinic Days: Monday, Wednesday, Friday</p>
-        </div>
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-lg font-semibold text-gray-600">
+          You need to be logged in to view this page.
+        </p>
       </div>
     );
-  };
-  
-  export default Profile;
-  
+  }
+  const psicologa = session.user.psicologa;
+
+  return (
+    <div className="container mx-auto max-w-md p-6 bg-white rounded-lg shadow-lg mt-10">
+      <h1 className="text-2xl font-bold text-center mb-4">Perfil</h1>
+      <div className="space-y-4">
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Nome:</span>
+          <span className="text-gray-600">{psicologa?.nome || "N/A"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Email:</span>
+          <span className="text-gray-600">{psicologa?.email || "N/A"}</span>
+        </div>
+        {/* Placeholder for additional `psicologa` fields */}
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Documento:</span>
+          <span className="text-gray-600">{psicologa?.documento}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold text-gray-700">Contato:</span>
+          <span className="text-gray-600">{psicologa?.contato}</span>
+        </div>
+      </div>
+      <div className="flex justify-center mt-6">
+        <button
+          className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-300"
+        >
+          Edit Profile
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
