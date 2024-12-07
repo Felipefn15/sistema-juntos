@@ -52,7 +52,6 @@ const Home = () => {
   // Handle slot selection
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     setNewEvent({
-      checked: false,
       start_date: start,
       end_date: end,
       id: "",

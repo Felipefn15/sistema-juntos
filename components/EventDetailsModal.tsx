@@ -10,7 +10,6 @@ interface EventDetailsModalProps {
   event: AppointmentWithPatient | null;
   onDelete: () => void;
   onWriteNotes: () => void;
-  onCheck: () => void;
 }
 
 const EventDetailsModal = ({

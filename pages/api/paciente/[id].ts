@@ -21,14 +21,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select("*");
 
       if (error) {
-        throw error;
+        throw new Error(error.message);
       }
 
       // Return the updated patient data
       return res.status(200).json(data[0]);
-    } catch (error: any) {
-      console.error("Error updating patient:", error.message);
-      return res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      console.error("Error updating patient:", error);
+
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      // Handle unexpected error types
+      return res.status(500).json({ error: "An unknown error occurred" });
     }
   }
 
