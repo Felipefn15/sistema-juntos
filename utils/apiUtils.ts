@@ -1,4 +1,4 @@
-import { Appointment, Pagamento, Patient } from "@/types";
+import { Agendamento,  Pagamento, Paciente } from "@/types";
 
 // Utility function to handle the `GET` request to fetch all patients
 export const fetchPatientsAPI = async () => {
@@ -37,7 +37,7 @@ export const addPatientAPI = async (patientData: {
 };
 
 // Update a patient
-export const updatePatientAPI = async (patient: Patient) => {
+export const updatePatientAPI = async (patient: Paciente) => {
   const response = await fetch(`/api/paciente/${patient.id}`, {
     method: "PUT",
     headers: {
@@ -53,14 +53,32 @@ export const updatePatientAPI = async (patient: Patient) => {
   return await response.json();
 };
 
+export const deletePatientAPI = async (id: string) => {
+  try {
+    const response = await fetch(`/api/paciente/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete patient");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error deleting patient:", error);
+    throw error;
+  }
+};
+
 // Utility function to handle the `POST` request to create an appointment
 import moment from "moment-timezone";
 
 export const addAppointmentAPI = async (appointmentData: {
   psicologa_id: string;
   paciente_id: string;
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
 }) => {
   try {
     //Convert start_date and end_date to UTC
@@ -103,12 +121,12 @@ export const fetchAppointmentsAPI = async () => {
   const data = await response.json();
 
   // Associate `pagamento` status with appointments
-  const formattedData = data.map((appointment: Appointment) => ({
+  const formattedData = data.map((appointment: Agendamento) => ({
     ...appointment,
     paid: appointment.pagamento?.some((p: Pagamento) => p.pago) || false, // Check if any payment exists and is paid
   }));
 
-  return formattedData;
+  return formattedData as Agendamento[];
 };
 
 export const deleteAppointmentAPI = async (appointmentId: string) => {
@@ -178,6 +196,15 @@ export const deleteDescriptionAPI = async (descriptionId: string) => {
   const data = await response.json();
   return data;
 };
+
+export const fetchPsychologistsAPI = async () => {
+  const response = await fetch("/api/psicologas");
+  if (!response.ok) {
+    throw new Error("Failed to fetch psychologists");
+  }
+  return response.json();
+};
+
 // Fetch psicologa by email
 export const getPsicologaByEmail = async (email: string) => {
   const baseUrl =
@@ -296,4 +323,35 @@ export const addPagamentoAPI = async (pagamentoData: {
 
   const data = await response.json();
   return data;
+};
+
+export const fetchEvolucaoHistoryAPI = async (pacienteId: string, psicologaId: string) => {
+  const response = await fetch(`/api/evolucao?psicologaId=${psicologaId}&pacienteId=${pacienteId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch evolução history");
+  }
+
+  return response.json();
+};
+
+export const updatePsicologaAPI = async (data: {
+  id: string;
+  nome: string;
+  documento: string;
+  contato: string;
+}) => {
+  const response = await fetch("/api/psicologa", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update profile");
+  }
+
+  return response.json();
 };

@@ -1,17 +1,34 @@
 import { withAuth } from "@/utils/withAuth";
 import { useEffect, useState } from "react";
-import { fetchPatientsAPI, updatePatientAPI, addPatientAPI } from "@/utils/apiUtils";
-import { Patient } from "@/types";
+import {
+  fetchPatientsAPI,
+  updatePatientAPI,
+  addPatientAPI,
+  deletePatientAPI,
+} from "@/utils/apiUtils";
+import { Paciente } from "@/types";
 import PatientForm from "@/components/PatientForm";
+import { Dialog } from "@headlessui/react";
+import EvolucaoHistoryModal from "@/components/EvolucaoHistoryModal";
+import PatientCard from "@/components/PatientCard";
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps = withAuth();
 
 const PatientPage = () => {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const { data: session } = useSession();
+  const psicologaId = session?.user?.psicologa?.id || "";
 
-  // Fetch patients on load
+  const [patients, setPatients] = useState<Paciente[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<Paciente | null>(null);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [deletePatientId, setDeletePatientId] = useState<string | null>(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedHistoryPatient, setSelectedHistoryPatient] = useState<
+    Paciente | null | undefined
+  >(null);
+
   useEffect(() => {
     const loadPatients = async () => {
       try {
@@ -25,23 +42,43 @@ const PatientPage = () => {
     loadPatients();
   }, []);
 
-  const handleSavePatient = async (patient: Patient) => {
+  const handleViewHistory = (patientId: string) => {
+    setSelectedHistoryPatient(
+      patients.find((patient) => patient.id === patientId)
+    );
+    setIsHistoryModalOpen(true);
+  };
+
+  const handleSavePatient = async (patient: Paciente) => {
     try {
       if (patient.id) {
-        // Update existing patient
         const updatedPatient = await updatePatientAPI(patient);
         setPatients((prev) =>
           prev.map((p) => (p.id === updatedPatient.id ? updatedPatient : p))
         );
       } else {
-        // Add new patient
         const newPatient = await addPatientAPI(patient);
         setPatients((prev) => [...prev, newPatient]);
       }
-      setSelectedPatient(null); 
-      setIsFormModalOpen(false); // Close the modal
+      setSelectedPatient(null);
+      setIsFormModalOpen(false);
     } catch (error) {
       console.error("Failed to save patient:", error);
+    }
+  };
+
+  const handleDeletePatient = async () => {
+    if (deletePatientId) {
+      try {
+        await deletePatientAPI(deletePatientId);
+        setPatients((prev) =>
+          prev.filter((patient) => patient.id !== deletePatientId)
+        );
+        setDeletePatientId(null);
+        setIsConfirmModalOpen(false);
+      } catch (error) {
+        console.error("Failed to delete patient:", error);
+      }
     }
   };
 
@@ -52,42 +89,28 @@ const PatientPage = () => {
       </h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {patients.map((patient) => (
-          <div
+          <PatientCard
             key={patient.id}
-            className="bg-white rounded-lg shadow-md p-6 space-y-4 hover:shadow-lg transition-shadow"
-          >
-            <h2 className="text-xl font-semibold text-blue-500">{patient.nome}</h2>
-            <p className="text-gray-700">
-              <strong>Contato:</strong> {patient.contato}
-            </p>
-            <p className="text-gray-700">
-              <strong>Responsável:</strong> {patient.responsavel}
-            </p>
-            <p className="text-gray-700">
-              <strong>Data de Nascimento:</strong> {new Date(patient.data_nascimento).toLocaleDateString("pt-BR")}
-            </p>
-            <div className="flex justify-end">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => {
-                  setSelectedPatient(patient)
-                  setIsFormModalOpen(true)
-                }}
-              >
-                Editar
-              </button>
-            </div>
-          </div>
+            patient={patient}
+            onViewHistory={handleViewHistory}
+            onEdit={(patient) => {
+              setSelectedPatient(patient);
+              setIsFormModalOpen(true);
+            }}
+            onDelete={(patientId) => {
+              setDeletePatientId(patientId);
+              setIsConfirmModalOpen(true);
+            }}
+          />
         ))}
       </div>
       <div className="flex justify-end mt-6">
         <button
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           onClick={() => {
-            setSelectedPatient(null)
-            setIsFormModalOpen(true) // Open modal for new patient
-            }
-          } 
+            setSelectedPatient(null);
+            setIsFormModalOpen(true);
+          }}
         >
           Adicionar Novo Paciente
         </button>
@@ -97,11 +120,49 @@ const PatientPage = () => {
           patient={selectedPatient}
           onSave={handleSavePatient}
           onCancel={() => {
-            setSelectedPatient(null)
-            setIsFormModalOpen(false)
+            setSelectedPatient(null);
+            setIsFormModalOpen(false);
           }}
         />
       )}
+      {isConfirmModalOpen && (
+        <Dialog
+          open={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          className="fixed inset-0 z-10 overflow-y-auto"
+        >
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="fixed inset-0 bg-black opacity-30" />
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+              <h2 className="text-xl font-bold mb-4">Confirmar Exclusão</h2>
+              <p className="text-gray-700 mb-6">
+                Tem certeza de que deseja excluir este paciente? Esta ação não
+                pode ser desfeita.
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  onClick={() => setIsConfirmModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  onClick={handleDeletePatient}
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      )}
+      <EvolucaoHistoryModal
+        paciente={selectedHistoryPatient}
+        psicologaId={psicologaId}
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+      />
     </div>
   );
 };

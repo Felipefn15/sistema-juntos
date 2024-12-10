@@ -1,21 +1,21 @@
-// pages/api/evolucao/index.ts
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/utils/supabaseClient";
 
+// Add a new description
 async function addDescription(description: string, eventId: string) {
   const { data, error } = await supabase
     .from("evolucao")
     .insert([{ descricao: description, agendamento_id: eventId, created_at: new Date(), updated_at: new Date() }])
-    .select('*');
+    .select("*");
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data[0]; // Return the inserted description object
+  return data[0];
 }
 
+// Delete a description
 async function deleteDescription(descriptionId: string) {
   const { error } = await supabase
     .from("evolucao")
@@ -29,6 +29,31 @@ async function deleteDescription(descriptionId: string) {
   return true;
 }
 
+// Fetch evolucoes with filters for pacienteId and psicologaId
+async function fetchEvolucoes(pacienteId: string, psicologaId: string) {
+  const { data, error } = await supabase
+  .from("evolucao")
+  .select(`
+    *,
+    agendamento:agendamento_id (
+      *,
+      paciente (
+        id, nome, contato, responsavel, data_nascimento
+      ),
+      psicologa (
+        id, nome, email
+      )
+    )
+  `)
+  .eq("agendamento.paciente_id", pacienteId)
+  .eq("agendamento.psicologa_id", psicologaId);
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.filter((evolucao) => evolucao.agendamento);
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.method === "POST") {
@@ -39,7 +64,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === "DELETE") {
       const { descriptionId } = req.body;
-      // Delete the description
       const success = await deleteDescription(descriptionId);
       if (success) {
         return res.status(200).json({ message: "Description deleted successfully" });
@@ -48,13 +72,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    res.status(405).json({ message: "Method Not Allowed" });
-  }  catch (error: unknown) {
-    // Safely handle the unknown error type
+    if (req.method === "GET") {
+      const { pacienteId, psicologaId } = req.query;
+
+      if (!pacienteId || !psicologaId) {
+        return res.status(400).json({ error: "Paciente ID and Psicologa ID are required" });
+      }
+
+      const evolucoes = await fetchEvolucoes(pacienteId as string, psicologaId as string);
+      return res.status(200).json(evolucoes);
+    }
+
+    res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+    return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
+  } catch (error: unknown) {
     if (error instanceof Error) {
+      console.error("API Error:", error.message);
       res.status(500).json({ message: "Internal Server Error", error: error.message });
     } else {
-      // Fallback error handling if error is not an instance of Error
+      console.error("Unknown Error:", error);
       res.status(500).json({ message: "Internal Server Error", error: "An unknown error occurred" });
     }
   }

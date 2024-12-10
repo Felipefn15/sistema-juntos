@@ -14,14 +14,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "GET") {
     const { data, error } = await supabase
-        .from("agendamento")
-        .select(`
-          *,
-          pagamento(pago) -- Include payment status
-        `);
+      .from("agendamento")
+      .select(`
+        *,
+        paciente (
+          id,
+          nome,
+          contato,
+          responsavel,
+          data_nascimento
+        ),
+        pagamento (
+          id,
+          descricao,
+          valor,
+          pago
+        ),
+        psicologa (
+          id,
+          nome,
+          email,
+          contato,
+          documento
+        )
+      `);
 
+    if (error) {
+      console.error("Error fetching agendamentos:", error.message);
+      return res.status(500).json({ error: "Failed to fetch agendamentos" });
+    }
 
-    if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
   }
 

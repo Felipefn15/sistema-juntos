@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Appointment, Patient } from "@/types";
+import { Agendamento, Paciente } from "@/types";
 import { Dialog } from "@headlessui/react";
 import { addAppointmentAPI, addPatientAPI } from "@/utils/apiUtils";
 import PatientForm from "@/components/PatientForm";
@@ -7,9 +7,9 @@ import PatientForm from "@/components/PatientForm";
 interface ScheduleModalProps {
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
-  newEvent: Appointment;
-  setNewEvent: (event: Appointment) => void;
-  existingPatients: Patient[];
+  newEvent: Agendamento;
+  setNewEvent: (event: Agendamento) => void;
+  existingPatients: Paciente[];
 }
 
 const ScheduleModal = ({
@@ -21,7 +21,7 @@ const ScheduleModal = ({
 }: ScheduleModalProps) => {
   const [isAddingNewPatient, setIsAddingNewPatient] = useState(false);
 
-  const handleSaveAppointment = async (event: Appointment) => {
+  const handleSaveAppointment = async (event: Agendamento) => {
     await addAppointmentAPI({
       paciente_id: event.paciente_id,
       psicologa_id: event.psicologa_id,
@@ -31,7 +31,7 @@ const ScheduleModal = ({
     setModalOpen(false);
   };
 
-  const handleSavePatient = async (patient: Patient) => {
+  const handleSavePatient = async (patient: Paciente) => {
     try {
       // Add a new patient and associate with the event
       const createdPatient = await addPatientAPI(patient);
@@ -44,11 +44,13 @@ const ScheduleModal = ({
       setNewEvent({
         ...newEvent,
         paciente_id: createdPatient.id,
+        paciente: createdPatient,
       });
       
       await handleSaveAppointment({
         ...newEvent,
         paciente_id: createdPatient.id,
+        paciente: createdPatient,
       })
       setIsAddingNewPatient(false); // Close the new patient form
       

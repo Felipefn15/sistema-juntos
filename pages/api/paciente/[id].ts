@@ -38,6 +38,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
+  if (req.method === "DELETE") {
+    try {
+      if (!id) {
+        return res.status(400).json({ error: "Patient ID is required" });
+      }
+
+      // Delete the patient
+      const { error } = await supabase
+        .from("paciente")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({ message: "Patient deleted successfully" });
+    }  catch (error: unknown) {
+      // Safely handle the unknown error type
+      if (error instanceof Error) {
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
+      } else {
+        // Fallback error handling if error is not an instance of Error
+        res.status(500).json({ message: "Internal Server Error", error: "An unknown error occurred" });
+      }
+    }
+  }
+
   // Handle unsupported methods
-  return res.setHeader("Allow", ["PUT"]).status(405).json({ error: `Method ${req.method} Not Allowed` });
+  return res.setHeader("Allow", ["PUT", "DELETE"]).status(405).json({ error: `Method ${req.method} Not Allowed` });
 }
