@@ -53,8 +53,8 @@ const Home = () => {
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     setNewEvent({
-      start_date: start,
-      end_date: end,
+      start_date: start.toDateString(),
+      end_date: end.toDateString(),
       id: "",
       paciente_id: "",
       psicologa_id: psicologaId,

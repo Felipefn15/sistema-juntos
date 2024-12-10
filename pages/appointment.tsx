@@ -65,23 +65,27 @@ const Appointment = () => {
       const cleanDateString = dateString
         .replace("T", " ")
         .replace(/ 00:00$/, "");
-        
-        const date = new Date(cleanDateString);
-
+  
+      const date = new Date(cleanDateString);
+  
       if (isNaN(date.getTime())) {
         throw new Error("Invalid date");
       }
-
+  
       const day = String(date.getDate()).padStart(2, "0");
       const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
       const year = date.getFullYear();
-
+  
       const hours = String(date.getHours()).padStart(2, "0");
       const minutes = String(date.getMinutes()).padStart(2, "0");
-
+  
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch (error) {
-      console.error("Error formatting date:", error?.message);
+      if (error instanceof Error) {
+        console.error("Error formatting date:", error.message);
+      } else {
+        console.error("Unknown error occurred while formatting date");
+      }
       return "Invalid date";
     }
   }

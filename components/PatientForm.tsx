@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Patient } from "@/types";
+import { Paciente } from "@/types";
 
 interface PatientFormProps {
-  patient?: Patient | null; // Pass null for creating a new patient
-  onSave: (data: Patient) => void; // Callback when the form is submitted
+  patient?: Paciente | null; // Pass null for creating a new patient
+  onSave: (data: Paciente) => void; // Callback when the form is submitted
   onCancel: () => void; // Callback to close the form
 }
 
 const PatientForm: React.FC<PatientFormProps> = ({ patient, onSave, onCancel }) => {
-  const [formData, setFormData] = useState<Patient>(
+  const [formData, setFormData] = useState<Paciente>(
     patient || {
       id: "", // Generate this server-side for new patients
       nome: "",
@@ -18,7 +18,7 @@ const PatientForm: React.FC<PatientFormProps> = ({ patient, onSave, onCancel }) 
     }
   );
 
-  const handleChange = (field: keyof Patient, value: string) => {
+  const handleChange = (field: keyof Paciente, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 

@@ -77,8 +77,8 @@ import moment from "moment-timezone";
 export const addAppointmentAPI = async (appointmentData: {
   psicologa_id: string;
   paciente_id: string;
-  start_date: Date;
-  end_date: Date;
+  start_date: string;
+  end_date: string;
 }) => {
   try {
     //Convert start_date and end_date to UTC
