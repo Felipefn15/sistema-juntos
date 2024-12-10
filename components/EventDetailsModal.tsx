@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import moment from "moment";
-import { AppointmentWithPatient, Pagamento } from "@/types";
+import { Agendamento, Pagamento } from "@/types";
 import PagamentoModal from "./PagamentoModal"; // Import PagamentoModal
 
 interface EventDetailsModalProps {
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
-  event: AppointmentWithPatient | null;
+  event: Agendamento | null;
   onDelete: () => void;
   onWriteNotes: () => void;
 }
@@ -38,7 +38,7 @@ const EventDetailsModal = ({
               <>
                 <div className="text-center mb-6">
                   <h2 className="text-xl font-semibold">
-                    {event.Patient?.nome}
+                    {event.paciente?.nome}
                   </h2>
                   <div className="text-sm text-gray-600">
                     <p>{moment(event.start).format("dddd, MMMM D, YYYY")}</p>

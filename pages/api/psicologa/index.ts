@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === "PUT") {
-      const { id, name, image } = req.body;
+      const { id, name, contato, documento } = req.body;
 
       if (!id) {
         return res.status(400).json({ error: "ID is required" });
@@ -65,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const { data, error } = await supabase
         .from("psicologa")
-        .update({ nome: name, image })
+        .update({ nome: name, contato, documento })
         .eq("id", id)
         .select("*");
 

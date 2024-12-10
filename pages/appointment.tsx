@@ -1,5 +1,9 @@
 import { Evolucao } from "@/types";
-import { addDescriptionAPI, getDescriptionsAPI, deleteDescriptionAPI } from "@/utils/apiUtils";
+import {
+  addDescriptionAPI,
+  getDescriptionsAPI,
+  deleteDescriptionAPI,
+} from "@/utils/apiUtils";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 
@@ -47,22 +51,40 @@ const Appointment = () => {
     }
   };
 
-  const handleEditDescription = (descriptionId: string, newDescription: string) => {
+  const handleEditDescription = (
+    descriptionId: string,
+    newDescription: string
+  ) => {
     // Implement editing logic (e.g., show an edit modal or directly modify the description)
     setDescription(newDescription); // Populate the textarea with the existing description
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  function formatDate(dateString: string): string {
+    try {
+      // Replace invalid characters and ensure it's parsed as a valid ISO string
+      const cleanDateString = dateString
+        .replace("T", " ")
+        .replace(/ 00:00$/, "");
+        
+        const date = new Date(cleanDateString);
 
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
+      if (isNaN(date.getTime())) {
+        throw new Error("Invalid date");
+      }
 
-    return `${day}/${month}/${year} - ${hours}:${minutes}`;
-  };
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+      const year = date.getFullYear();
+
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch (error) {
+      console.error("Error formatting date:", error?.message);
+      return "Invalid date";
+    }
+  }
 
   return (
     <div className="container mx-auto max-w-4xl p-6 bg-white rounded-lg shadow-lg">
@@ -70,7 +92,7 @@ const Appointment = () => {
 
       {/* Agendamento Details */}
       <div className="space-y-4">
-        <div className="flex justify-between">
+        <div className="flex flex-col md:flex-row justify-between">
           <p className="font-semibold text-lg">
             <strong>Paciente:</strong>{" "}
             <span className="text-gray-600">{pacienteName}</span>
@@ -80,7 +102,7 @@ const Appointment = () => {
             <span className="text-gray-600">{psicologaName}</span>
           </p>
         </div>
-        <div className="flex justify-between">
+        <div className="flex flex-col md:flex-row justify-between">
           <p className="font-semibold text-lg">
             <strong>Começo:</strong>{" "}
             <span className="text-gray-600">

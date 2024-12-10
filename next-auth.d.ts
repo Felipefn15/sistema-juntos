@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import { Psicologa } from "./types";
 
 declare module "next-auth" {
   interface User {
@@ -10,13 +11,7 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-      psicologa?: {
-        id: string;
-        nome: string;
-        email: string;
-        documento: string;
-        contato: string;
-      };
+      psicologa?: Psicologa | null;
     };
   }
 }

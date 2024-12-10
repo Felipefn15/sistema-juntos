@@ -63,6 +63,15 @@ const Navbar = () => {
             >
               Pacientes
             </Link>
+            <Link
+              href="/pagamento-historico"
+              className={`block w-full text-left ${
+                isActive("/pagamento-historico") ? "font-bold underline" : ""
+              } hover:bg-blue-400 p-2 rounded`}
+              onClick={() => setMenuOpen(false)}
+            >
+              Histórico de Pagamento
+            </Link>
             {session && (
               <div className="pt-4">
                 <LogoutButton />
@@ -98,6 +107,14 @@ const Navbar = () => {
           }`}
         >
           Pacientes
+        </Link>
+        <Link
+          href="/pagamento-historico"
+          className={`mb-4 p-2 rounded w-full ${
+            isActive("/pagamento-historico") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
+          }`}
+        >
+          Histórico de Pagamento
         </Link>
         {session && (
           <div className="mt-auto w-full">
