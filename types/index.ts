@@ -30,7 +30,7 @@ export interface Agendamento extends Event {
   paciente_id: string;
   psicologa_id: string;
   paciente?: Paciente;
-  pagamento?: Pagamento[];
+  pagamento?: Pagamento[] | null;
   psicologa?: Psicologa;
 }
 

@@ -1,129 +1,71 @@
-import Link from "next/link";
-import LogoutButton from "./Logout";
-import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+"use client"
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import LogoutButton from "./Logout"
+import { useRouter } from "next/router"
+import { useSession } from "next-auth/react"
+import { Menu, X } from 'lucide-react'
 
 const Navbar = () => {
-  const { data: session } = useSession(); // Get the session
-  const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false); // State for toggling menu
-  const psicologaName = session?.user?.name?.split(' ')[0] || "";
+  const { data: session } = useSession()
+  const router = useRouter()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const psicologaName = session?.user?.name?.split(" ")[0] || ""
 
-  const isActive = (path: string) => router.pathname === path;
+  const isActive = (path: string) => router.pathname === path
+
+  const navItems = [
+    { href: "/home", label: "Home" },
+    { href: "/appointment", label: "Agendamento" },
+    { href: "/profile", label: "Perfil" },
+    { href: "/patient", label: "Pacientes" },
+    { href: "/pagamento-historico", label: "Histórico de Pagamento" },
+  ]
 
   return (
     <>
-      {/* Mobile Navbar */}
-      <nav className="lg:hidden bg-blue-500 text-white p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold">JUNTOS - {psicologaName}</h1>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-white focus:outline-none"
-          >
-            {menuOpen ? "✖" : "☰"} {/* Toggle between open/close icons */}
-          </button>
-        </div>
-        {menuOpen && (
-          <div className="flex flex-col mt-4 space-y-2">
-            <Link
-              href="/home"
-              className={`block w-full text-left ${
-                isActive("/home") ? "font-bold underline" : ""
-              } hover:bg-blue-400 p-2 rounded`}
-              onClick={() => setMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              href="/appointment"
-              className={`block w-full text-left ${
-                isActive("/appointment") ? "font-bold underline" : ""
-              } hover:bg-blue-400 p-2 rounded`}
-              onClick={() => setMenuOpen(false)}
-            >
-              Agendamento
-            </Link>
-            <Link
-              href="/profile"
-              className={`block w-full text-left ${
-                isActive("/profile") ? "font-bold underline" : ""
-              } hover:bg-blue-400 p-2 rounded`}
-              onClick={() => setMenuOpen(false)}
-            >
-              Perfil
-            </Link>
-            <Link
-              href="/patient"
-              className={`block w-full text-left ${
-                isActive("/patient") ? "font-bold underline" : ""
-              } hover:bg-blue-400 p-2 rounded`}
-              onClick={() => setMenuOpen(false)}
-            >
-              Pacientes
-            </Link>
-            <Link
-              href="/pagamento-historico"
-              className={`block w-full text-left ${
-                isActive("/pagamento-historico") ? "font-bold underline" : ""
-              } hover:bg-blue-400 p-2 rounded`}
-              onClick={() => setMenuOpen(false)}
-            >
-              Histórico de Pagamento
-            </Link>
+      {/* Hamburger menu for mobile */}
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        className="text-blue-500 focus:outline-none z-50"
+      >
+        {menuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Responsive Navbar */}
+      <nav
+        className={`fixed inset-y-0 left-0 z-40 w-full bg-gray-800 bg-opacity-50 text-white transform transition-transform duration-300 ease-in-out ${
+          menuOpen ? 'translate-x-0 flex' : '-translate-x-full hidden'
+        }`}
+      >
+        <div
+            className={`z-40 w-64 bg-blue-500 text-white p-4 `}
+        >
+          <div className="flex flex-col h-full">
+            <h1 className="mb-8 text-2xl font-semibold">JUNTOS - {psicologaName}</h1>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`mb-4 p-2 rounded w-full ${
+                  isActive(item.href) ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
+                }`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
             {session && (
-              <div className="pt-4">
+              <div className="mt-auto w-full">
                 <LogoutButton />
               </div>
             )}
           </div>
-        )}
-      </nav>
-
-      {/* Desktop Navbar */}
-      <nav className="hidden lg:flex fixed top-0 left-0 h-screen w-64 bg-blue-500 text-white flex-col items-start p-4">
-        <h1 className="mb-8 text-2xl font-semibold">JUNTOS - {psicologaName}</h1>
-        <Link
-          href="/home"
-          className={`mb-4 p-2 rounded w-full ${
-            isActive("/home") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
-          }`}
-        >
-          Home
-        </Link>
-        <Link
-          href="/profile"
-          className={`mb-4 p-2 rounded w-full ${
-            isActive("/profile") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
-          }`}
-        >
-          Perfil
-        </Link>
-        <Link
-          href="/patient"
-          className={`mb-4 p-2 rounded w-full ${
-            isActive("/patient") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
-          }`}
-        >
-          Pacientes
-        </Link>
-        <Link
-          href="/pagamento-historico"
-          className={`mb-4 p-2 rounded w-full ${
-            isActive("/pagamento-historico") ? "bg-blue-400 font-bold" : "hover:bg-blue-400"
-          }`}
-        >
-          Histórico de Pagamento
-        </Link>
-        {session && (
-          <div className="mt-auto w-full">
-            <LogoutButton />
           </div>
-        )}
       </nav>
     </>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

@@ -1,0 +1,83 @@
+.custom-calendar {
+  @apply font-sans bg-[#F8F7FF];
+}
+
+.custom-calendar .rbc-header {
+  @apply py-3 font-medium border-b border-[#6B7AE8]/20 bg-white text-[#6B7AE8];
+}
+
+.custom-calendar .rbc-time-view {
+  @apply border border-[#6B7AE8]/20 rounded-lg overflow-hidden bg-white;
+}
+
+.custom-calendar .rbc-time-header {
+  @apply border-b border-[#6B7AE8]/20;
+}
+
+.custom-calendar .rbc-time-header-content {
+  @apply border-l border-[#6B7AE8]/20;
+}
+
+.custom-calendar .rbc-time-content {
+  @apply border-t border-[#6B7AE8]/20;
+}
+
+.custom-calendar .rbc-timeslot-group {
+  @apply border-b border-[#6B7AE8]/10;
+}
+
+.custom-calendar .rbc-time-gutter {
+  @apply text-sm text-[#6B7AE8];
+}
+
+.custom-calendar .rbc-time-slot {
+  @apply text-sm;
+}
+
+.custom-calendar .rbc-event {
+  @apply rounded-lg shadow-sm border-none;
+}
+
+.custom-calendar .rbc-today {
+  @apply bg-[#F8F7FF];
+}
+
+.custom-calendar .rbc-current-time-indicator {
+  @apply bg-[#6B7AE8];
+}
+
+/* Remove default toolbar */
+.custom-calendar .rbc-toolbar {
+  @apply hidden;
+}
+
+/* Adjust time column width */
+.custom-calendar .rbc-time-gutter {
+  @apply w-20;
+}
+
+/* Adjust time slots height */
+.custom-calendar .rbc-timeslot-group {
+  @apply h-16;
+}
+
+/* Style the current time indicator */
+.custom-calendar .rbc-current-time-indicator {
+  @apply h-0.5;
+}
+
+/* Override the default header format */
+.custom-calendar .rbc-header {
+  @apply text-sm;
+}
+
+/* Style the all-day events section */
+.custom-calendar .rbc-allday-cell {
+  @apply hidden;
+}
+
+/* Remove extra borders */
+.custom-calendar .rbc-time-view .rbc-row {
+  @apply border-0;
+}
+

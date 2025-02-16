@@ -45,6 +45,7 @@ const ScheduleModal = ({
         ...newEvent,
         paciente_id: createdPatient.id,
         paciente: createdPatient,
+        pagamento: null,
       });
       
       await handleSaveAppointment({
